@@ -24,10 +24,7 @@
 		"gray": "#aaaaaa",
 		"dimGray": "#5c7a8c",
 		"userMsgBg": "#1F4662",
-		"customMsgBg": "#15283a",
-		"toolPendingBg": "#15232d",
-		"toolSuccessBg": "#15232d",
-		"toolErrorBg": "#15232d"
+		"toolErrorBg": "#3a1f2b"
 	},
 	"colors": {
 		"accent": "yellow",
@@ -45,11 +42,11 @@
 		"selectedBg": "blueHighlight",
 		"userMessageBg": "userMsgBg",
 		"userMessageText": "white",
-		"customMessageBg": "customMsgBg",
+		"customMessageBg": "cobaltBlue",
 		"customMessageText": "paleBlue",
 		"customMessageLabel": "yellow",
-		"toolPendingBg": "toolPendingBg",
-		"toolSuccessBg": "toolSuccessBg",
+		"toolPendingBg": "cobaltBlue",
+		"toolSuccessBg": "cobaltBlue",
 		"toolErrorBg": "toolErrorBg",
 		"toolTitle": "yellow",
 		"toolOutput": "paleBlue",
