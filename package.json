@@ -3,10 +3,31 @@
   "version": "1.0.0",
   "description": "Custom pi extensions and skills",
   "license": "MIT",
-  "keywords": ["pi-package", "theme"],
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "pi-package",
+    "theme",
+    "extension",
+    "skill"
+  ],
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "tsc"
+  },
   "pi": {
-    "extensions": ["./extensions"],
-    "skills": ["./skills"],
-    "themes": ["./themes"]
+    "extensions": [
+      "./extensions"
+    ],
+    "skills": [
+      "./skills"
+    ],
+    "themes": [
+      "./themes"
+    ]
+  },
+  "dependencies": {
+    "@types/node": "^25.9.1"
   }
 }

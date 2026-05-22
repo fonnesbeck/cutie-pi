@@ -13,6 +13,7 @@ The package currently includes the following tools, with more on the way:
 | Extension | Description |
 |-----------|-------------|
 | [`code-simplifier`](extensions/code-simplifier.ts) | Tracks files modified during an agent run and can automatically (or on-demand) trigger a follow-up pass that simplifies and refines the code for clarity, consistency, and maintainability. |
+| [`nu-user-bash`](extensions/nu-user-bash.ts) | Intercepts `user_bash` events to route commands through Nushell instead of the default shell. |
 
 **Commands added:**
 - `/simplify` — Manually run simplification on recently modified files.
@@ -27,6 +28,13 @@ The package currently includes the following tools, with more on the way:
 | [`socratic-review`](skills/socratic-review/SKILL.md) | Rigorous Socratic questioning to stress-test a plan or design. Invoke with "review my plan," "grill me," or `/skill:socratic-review`. Produces a `DECISION_LOG.md` at the end. |
 | [`review-plans`](skills/review-plans/SKILL.md) | Pre-execution audit of software and data-science project plans. Invoke with "review this plan," "audit this proposal," or `/skill:review-plans`. Produces a categorized severity report (`REVIEW.md`) using the PCS framework for data-science plans. |
 | [`review-implementation`](skills/review-implementation/SKILL.md) | Compares a finished implementation against its original plan to identify gaps, divergences, and efficiency opportunities. Invoke with "compare this to the plan," "review implementation," or `/skill:review-implementation`. Produces `IMPLEMENTATION_REVIEW.md`. |
+
+### Themes
+
+| Theme | Description |
+|-------|-------------|
+| [`cobalt2`](themes/cobalt2.json) | A high-contrast blue theme inspired by the classic Cobalt 2 color palette. |
+| [`cutie-pi`](themes/cutie-pi.json) | A warm dark theme with soft orange and purple accents. |
 
 ## Installation
 
@@ -55,7 +63,7 @@ The package currently includes the following tools, with more on the way:
 ## Requirements
 
 - [pi](https://github.com/mariozechner/pi) coding agent
-- Node.js (for the TypeScript extension)
+- Node.js (for TypeScript extensions)
 
 ## License
 

@@ -1,11 +1,11 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 // Track files modified during the current agent run and across the session
 const currentRunModifications = new Set<string>();
 const sessionModifications = new Set<string>();
-const pendingSimplificationPrompts = new Set<string>();
+let isNextTurnSimplification = false;
 let autoSimplify = false;
 let isSimplificationTurn = false;
 
@@ -14,12 +14,13 @@ function getSkillContent(): string {
 	try {
 		return fs.readFileSync(skillPath, "utf-8");
 	} catch {
+		console.warn(`[code-simplifier] Skill file not found at: ${skillPath}`);
 		return "";
 	}
 }
 
 function extractPathFromToolInput(toolName: string, input: Record<string, unknown>): string | undefined {
-	if (toolName === "edit" || toolName === "write" || toolName === "read") {
+	if (toolName === "edit" || toolName === "write") {
 		return (input.path as string) || (input.file_path as string);
 	}
 	return undefined;
@@ -34,12 +35,12 @@ function getSimplificationSystemPrompt(): string {
 
 export default function (pi: ExtensionAPI) {
 	// Reset per-run tracking at the start of each user prompt
-	pi.on("agent_start", async (_event, _ctx) => {
+	pi.on("agent_start", (_event, _ctx) => {
 		currentRunModifications.clear();
 	});
 
 	// Track file modifications via tool results
-	pi.on("tool_result", async (event, _ctx) => {
+	pi.on("tool_result", (event, _ctx) => {
 		if (event.toolName === "edit" || event.toolName === "write") {
 			const filePath = extractPathFromToolInput(event.toolName, event.input);
 			if (filePath) {
@@ -50,7 +51,7 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	// Auto-trigger simplification after the agent finishes its work
-	pi.on("agent_end", async (_event, _ctx) => {
+	pi.on("agent_end", (_event, _ctx) => {
 		// Prevent infinite loops: don't auto-trigger on simplification turns
 		if (isSimplificationTurn) {
 			isSimplificationTurn = false;
@@ -65,15 +66,15 @@ export default function (pi: ExtensionAPI) {
 				`Please review and simplify the recently modified code for clarity, consistency, and maintainability while preserving all functionality.\n\n` +
 				`Recently modified files: ${files}`;
 
-			pendingSimplificationPrompts.add(promptText);
+			isNextTurnSimplification = true;
 			pi.sendUserMessage(promptText, { deliverAs: "followUp" });
 		}
 	});
 
 	// Inject simplification instructions into the system prompt for simplification turns
-	pi.on("before_agent_start", async (event, _ctx) => {
-		if (pendingSimplificationPrompts.has(event.prompt)) {
-			pendingSimplificationPrompts.delete(event.prompt);
+	pi.on("before_agent_start", (event, _ctx) => {
+		if (isNextTurnSimplification) {
+			isNextTurnSimplification = false;
 			isSimplificationTurn = true;
 			const instructions = getSimplificationSystemPrompt();
 			if (instructions) {
@@ -104,7 +105,7 @@ export default function (pi: ExtensionAPI) {
 				`Please review and simplify the recently modified code for clarity, consistency, and maintainability while preserving all functionality.\n\n` +
 				`Recently modified files: ${fileList}`;
 
-			pendingSimplificationPrompts.add(promptText);
+			isNextTurnSimplification = true;
 			pi.sendUserMessage(promptText);
 		},
 	});
@@ -116,10 +117,10 @@ export default function (pi: ExtensionAPI) {
 			const arg = args.trim().toLowerCase();
 			if (arg === "on") {
 				autoSimplify = true;
-				ctx.ui.notify("Auto-simplify enabled.", "success");
+				ctx.ui.notify("Auto-simplify enabled.", "info");
 			} else if (arg === "off") {
 				autoSimplify = false;
-				ctx.ui.notify("Auto-simplify disabled.", "success");
+				ctx.ui.notify("Auto-simplify disabled.", "info");
 			} else {
 				ctx.ui.notify(
 					`Auto-simplify is ${autoSimplify ? "enabled" : "disabled"}. Usage: /simplify-auto on|off`,
