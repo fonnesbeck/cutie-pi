@@ -32,6 +32,9 @@ and produce concrete, shareable feedback that the original developer can act on.
      strategy)?"
    - "Who is the audience for this review — the author, a tech lead, or
      stakeholders?"
+   - "Are there any red flags (known risks, concerns, or unresolved questions)
+     or yellow flags (areas you are unsure about, decisions that feel shaky)
+     you already see in this plan?"
 
 2. **Classify the plan type.** Infer from content whether the plan is:
    - General software / infrastructure
