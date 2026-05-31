@@ -1,3 +1,43 @@
+# Core Design Principles
+
+These rules are non-negotiable. They reflect what works for technical
+audiences.
+
+## One Idea Per Slide
+
+Each slide communicates exactly one concept. If you find yourself wanting two
+titles, split it. The presenter notes carry the nuance; the slide carries the
+punchline.
+
+## Visuals Dominate, Text Supports
+
+When an image explains the concept, let it fill the slide. Text should be
+minimal: a title, a short label, or a single equation. Never put a paragraph on
+a slide.
+
+## Color Signals Structure
+
+Use color intentionally, not decoratively. A color change should tell the
+audience "new section," "important point," or "contrast." Random color
+variations create noise.
+
+## Math Must Be Readable
+
+Equations are central to data science talks. Default size is too small. Use
+`$$\Huge ... $$` or `$$\Large ... $$` for displayed math. Inline math should be
+rare; when used, keep it simple.
+
+## Presenter Notes Are the Script
+
+Write full talking points in HTML comments. Notes should contain:
+- The complete verbal explanation of the slide
+- Citations and sources
+- Transition sentences to the next slide
+- Answers to anticipated questions
+
+Never leave notes empty or write one-word reminders like "explain this."
+
+
 # Visual Design Principles for Technical Slides
 
 ## Typography
@@ -137,3 +177,26 @@ neversink_slug: 'PyMC Labs'
 ```
 
 Keep logos subtle. They should not compete with slide content.
+
+
+# Anti-Patterns
+
+Avoid these common mistakes:
+
+**Bullet-point walls.** If a slide has more than 5 bullets, turn it into
+multiple slides, a diagram, or a table.
+
+**Decorative images.** Every image should convey information. If removing the
+image would not reduce understanding, remove it.
+
+**Tiny math.** Default LaTeX size is unreadable from the back row. Always size
+up equations.
+
+**Animation overuse.** `v-click` is for revealing steps in an argument. Do not
+animate every bullet point on every slide. It slows pacing and frustrates
+audiences.
+
+**Inconsistent branding.** Logo position, color palette, and font choices should
+be consistent across all slides. Pick a scheme in headmatter and stick to it.
+
+**Empty presenter notes.** Notes are the script. Write them fully.
