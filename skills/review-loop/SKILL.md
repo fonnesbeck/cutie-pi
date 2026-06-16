@@ -57,7 +57,7 @@ then loop against that file so every pass reviews the same text.
    - If scope or success criteria are ambiguous, run `socratic-review` first and
      fold its decisions into the plan (or a loop-owned
      `local://REVIEW_DECISIONS.md`). `socratic-review` natively writes a
-     repo-root `DECISION_LOG.md`; redirect that into the loop's `local://`
+     repo-root `DECISION_LOG.md`; move or copy that into the loop's `local://`
      artifact unless the user wants repo-local planning files.
    - Set `max_passes=3` unless the user gave another bound.
    - Fix artifact names up front (see **Artifacts**). Prefer `local://` unless
@@ -73,11 +73,12 @@ then loop against that file so every pass reviews the same text.
      path when it wrote a file).
 
 3. **Validate output.** Locate this pass's review: at the pass path when the main
-   agent is writable, or in the reviewer's inline return (conversation/IRC) when
+   agent is writable, or in the reviewer's inline return (conversation/chat) when
    the main agent is in plan mode. Read it before extracting findings. If the
    counts are missing, derive them from the `🔴`/`🟡`/`🟢` headings. If the path
-   is missing or unreadable, ask the reviewer once over IRC; if still unreadable,
-   rerun the pass. Never advance without a readable review and exact counts.
+   is missing or unreadable, ask the reviewer once over the conversation channel;
+   if still unreadable, rerun the pass. Never advance without a readable review
+   and exact counts.
 
 4. **Revise (address-review pattern).** Extract every Critical, Warning, and Note
    finding and assign each a stable ID `P<pass>-<C|W|N><ordinal>` (e.g. `P1-C1`,
@@ -118,9 +119,9 @@ These are process artifacts; do not commit them unless the user asks.
 **Main agent in plan mode** (only the plan file is writable, e.g. hardening a
 staged plan). No separate files are possible — read each reviewer's inline return
 during the loop, and fold the per-pass counts and the same per-finding
-dispositions into the final closure report (append them as a "Dispositions"
-section and set the closure's `Disposition trail:` to `inlined below`). The
-revised plan is the durable artifact.
+dispositions into the final closure report (append a `Dispositions` section at
+the end of the final response block and set the closure's `Disposition trail:` to
+`inlined below`). The revised plan is the durable artifact.
 
 ## Stop conditions (the Goal)
 
