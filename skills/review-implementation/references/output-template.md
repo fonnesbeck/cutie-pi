@@ -52,7 +52,7 @@ reference]
 **Implementation status:** [What the code actually does, with file/function
 reference]
 
-**Assessment:** [Partially implemented / Divergent]
+**Assessment:** [Partially implemented / Divergent / Simplification opportunity / Efficiency opportunity]
 
 **Recommendation:** [Concrete next step the developer should take]
 
@@ -68,7 +68,7 @@ reference]
 **Implementation status:** [What the code actually does, with file/function
 reference]
 
-**Assessment:** [Beyond scope / Efficiency opportunity / Minor divergence]
+**Assessment:** [Beyond scope / Simplification opportunity / Efficiency opportunity / Minor divergence]
 
 **Recommendation:** [Concrete next step the developer should take]
 

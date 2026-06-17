@@ -234,6 +234,30 @@ behavior, type hint evaluation, and dependency resolution.
 
 ---
 
+## Simplification & Parsimony
+
+### 🟡 Warning — Training script has import-time side effects
+
+**Plan requirement:** "A single Python script `train.py` will train the model."
+
+**Implementation status:** `train.py` performs data loading, splitting, scaling,
+model fitting, and artifact writes at module import time.
+
+**Assessment:** Simplification opportunity
+
+**Recommendation:** Keep one `train.py`, but move the stages into small local
+functions (`load_data`, `split_data`, `fit_preprocessor`, `train_model`,
+`save_artifacts`) and call them from `main()` under
+`if __name__ == "__main__":`. Do not create extra modules because the plan chose
+a single-script training architecture.
+
+**Why:** Import-time side effects are a Warning because they make tests, reuse,
+and operational imports fragile. The recommended structure is still parsimonious
+because it avoids new modules, preserves the planned single-script architecture,
+and keeps behavior unchanged while making execution explicit.
+
+---
+
 ## Efficiency
 
 ### 🟢 Note — Model is reloaded on every API request in some deployment patterns
