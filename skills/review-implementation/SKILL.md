@@ -80,8 +80,7 @@ You do not modify any files. You only observe, compare, and report.
 5. **Evaluate simplification, parsimony, and efficiency.** Even if the plan is
    silent on code style or performance targets, review the plan-touched
    implementation for opportunities to make the code simpler without changing
-   behavior. Apply the same principles as `code-simplifier`, but remain
-   read-only.
+   behavior. Apply the same principles as the code-simplifier simplification-turn instructions, but remain read-only and do not invoke `/simplify` or spawn a simplifier agent.
    - **Functionality preservation:** Recommendations must preserve externally
      observable behavior. If a simplification could change behavior, state the
      required test or guardrail before recommending it.

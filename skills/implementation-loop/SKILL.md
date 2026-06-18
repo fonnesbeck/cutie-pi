@@ -1,14 +1,14 @@
 ---
 name: implementation-loop
 description: >-
-  Drive a complete implementation from a plan through a bounded implement → implementation-review → address-review loop, then run code-simplifier. Use this skill when the user asks to "run an implementation loop", "implement this plan and iterate until clean", "execute a plan with implementation review", "spawn an implementation reviewer and address findings", or wants an implementation analog of review-loop.
+  Drive a complete implementation from a plan through a bounded implement → implementation-review → address-review loop, then run an inline simplification pass using the code-simplifier skill instructions; never spawn code-simplifier as a task subagent. Use this skill when the user asks to "run an implementation loop", "implement this plan and iterate until clean", "execute a plan with implementation review", "spawn an implementation reviewer and address findings", or wants an implementation analog of review-loop.
 ---
 
 # Implementation Loop
 
 Use this when the deliverable is executable code, configuration, or documentation produced from a plan and should be implemented, independently reviewed against that plan, fixed, re-reviewed, and simplified before completion.
 
-This skill is a thin protocol wrapper. It delegates review judgment to `review-implementation`, finding triage to `address-review`, and final cleanup to `code-simplifier`; it adds only loop orchestration, role separation, artifact names, pass bounds, safety gates, and closure criteria. Do not restate how to judge implementation quality; defer that to `review-implementation`.
+This skill is a thin protocol wrapper. It delegates review judgment to `review-implementation`, finding triage to `address-review`, and final cleanup to the invoking agent, using the code-simplifier skill instructions inline; it adds only loop orchestration, role separation, artifact names, pass bounds, safety gates, and closure criteria. Do not restate how to judge implementation quality; defer that to `review-implementation`.
 
 ## The three primitives
 
@@ -39,7 +39,7 @@ Execution sequence for writable mode:
 3. Run implementation-review in a fresh reviewer subagent.
 4. Address every finding with an evidence-backed disposition.
 5. Re-review until no actionable findings remain or max_passes is reached.
-6. Run code-simplifier, verify, and post-review simplifier changes if any files changed.
+6. Run inline simplification using the code-simplifier skill instructions, verify, and post-review simplifier changes if any files changed.
 Verification commands to inspect before running: <commands listed by the plan, or "discover from project config">
 Rerun condition: invoke implementation-loop again when file writes and safe commands are allowed.
 Files changed: none.
@@ -103,7 +103,7 @@ Set `max_passes=3` unless the user provides a different bound.
 Default to session-local process artifacts:
 
 - `local://IMPLEMENTATION_REVIEW-P<N>.md` — one implementation review report per normal pass.
-- `local://IMPLEMENTATION_REVIEW-SIMPLIFY.md` — the post-simplification review report when `code-simplifier` changes files.
+- `local://IMPLEMENTATION_REVIEW-SIMPLIFY.md` — the post-simplification review report when the inline simplification pass changes files.
 - `local://IMPLEMENTATION_REVIEW_DISPOSITION.md` — cumulative finding trail.
 
 If the user explicitly asks for repo-local artifacts, store them in the same directory as the plan when the plan is a repo file; otherwise store them in the repository root. Use the same basenames listed above.
@@ -137,25 +137,28 @@ Stop the normal implementation-review loop only when one of these conditions hol
 
 An evidence-only disposition pass with no file changes can close without another review only if every latest-review finding has a complete `Won't fix` or duplicate disposition with `Changed: None`, `Equivalent to` where applicable, and evidence.
 
-If `max_passes` is reached with unresolved actionable findings, mark the loop `Incomplete`, list the remaining findings, and do not run the final `code-simplifier` pass or claim completion.
+If `max_passes` is reached with unresolved actionable findings, mark the loop `Incomplete`, list the remaining findings, and do not run the final simplification pass or claim completion.
 
 Do not stop merely because Critical and Warning are gone. A Note can encode a missing acceptance criterion, an ambiguous contract, or a future-reader confusion.
 
 ## Final simplification
 
-Run `code-simplifier` only after the normal implementation-review loop closes as complete or complete-with-non-actionable findings.
+Run simplification only after the normal implementation-review loop closes as complete or complete-with-non-actionable findings.
 
-Scope simplification to files modified by the initial implementation or review dispositions. Apply simplifier changes that preserve behavior and match project conventions.
+`code-simplifier` in cutie-pi is a skill/extension prompt, not an independent task subagent. Never call `task(agent="code-simplifier")`, never spawn a `code-simplifier` subagent, and never treat simplification as an independent review. The invoking implementation-loop agent owns the edits and verification.
+
+Simplification invocation:
+- If the cutie-pi `/simplify` extension command has already queued a simplification follow-up turn, that follow-up turn receives the `skills/code-simplifier/SKILL.md` instructions through the extension; finish that turn and then resume this protocol.
+- Otherwise, read `skill://code-simplifier` if it is not already in context, scope it to files modified by the initial implementation or review dispositions, and apply those instructions inline yourself.
+- If no safe simplification exists, record `Simplification: No changes` and proceed directly to the final response.
 
 Rerun the same safe verification commands that proved the final disposition pass, or reuse `verification=Not run — no safe project-local command found; inspected <files/config>` when no safe command exists.
 
-If `code-simplifier` changes no files, proceed directly to the final response.
-
-If `code-simplifier` changes any file, spawn one fresh independent reviewer for a post-simplification audit and save/read it as `IMPLEMENTATION_REVIEW-SIMPLIFY.md`. This audit does not count against `max_passes` and has one purpose: confirm simplifier edits did not introduce plan divergence, broken behavior, or new actionable issues.
+If inline simplification changes any file, spawn one fresh independent reviewer for a post-simplification audit and save/read it as `IMPLEMENTATION_REVIEW-SIMPLIFY.md`. This audit does not count against `max_passes` and has one purpose: confirm simplifier edits did not introduce plan divergence, broken behavior, or new actionable issues.
 
 If the post-simplification audit reports `Critical=0, Warning=0, Note=0` or only evidence-closed non-actionable findings, proceed to the final response.
 
-If the post-simplification audit reports any actionable finding and the normal loop has remaining pass capacity, address it with the same disposition process, then continue with the next normal pass number and repeat normal closure before running `code-simplifier` again.
+If the post-simplification audit reports any actionable finding and the normal loop has remaining pass capacity, address it with the same disposition process, then continue with the next normal pass number and repeat normal closure before running simplification again.
 
 If the post-simplification audit reports any actionable finding and `max_passes` is already exhausted, mark the loop `Incomplete` and list the finding. Do not claim completion.
 
